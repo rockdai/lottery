@@ -1,0 +1,184 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <title>抽奖</title>
+  <style type="text/css">
+    body {
+      background-color: #6600cc;
+      margin: 0;
+      padding: 0;
+    }
+    .btn {
+      display: inline-block;
+      padding: 10px 16px;
+      font-size: 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+         -moz-user-select: none;
+          -ms-user-select: none;
+              user-select: none;
+      border: 1px solid transparent;
+      -webkit-appearance: button;
+    }
+    .btn-primary {
+      color: #fff;
+      background-color: #337ab7;
+      border-color: #2e6da4;
+    }
+    .btn-success {
+      color: #fff;
+      background-color: #5cb85c;
+      border-color: #4cae4c;
+    }
+    .title {
+      text-align: center;
+      color: #ffffff;
+      margin: 20px 0 37px 0;
+    }
+    .avatar {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: 20px;
+      height: 400px;
+    }
+    .name {
+      color: red;
+      font-size: 34px;
+      font-weight: bolder;
+      text-align: center;
+      min-height: 50px;
+    }
+    .radio-group {
+      color: #fff;
+      font-size: 24px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .radio-group label {
+      margin-right: 20px;
+    }
+    .radio-group label:last-child {
+      margin-right: 0;
+    }
+    .button-group {
+      text-align: center;
+    }
+    .button-group .btn {
+      min-width: 100px;
+      margin-right: 20px;
+    }
+    .button-group .btn:last-child {
+      margin-right: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="title">抽奖</h1>
+  <audio id="audio" src="music/sound.mp3" preload="auto" loop="true" ></audio>
+  <img id="image" class="avatar" src="photo/0.jpg"/>
+  <p id="name" class="name"></p>
+
+  <div class="radio-group">
+    <label for="group1">
+      <input type="radio" id="group1" name="group" value="1" checked>
+      第一组
+    </label>
+    <label for="group2">
+      <input type="radio" id="group2" name="group" value="2">
+      第二组
+    </label>
+    <label for="group3">
+      <input type="radio" id="group3" name="group" value="3">
+      第三组
+    </label>
+    <label for="group4">
+      <input type="radio" id="group4" name="group" value="4">
+      第四组
+    </label>
+    <label for="group_all">
+      <input type="radio" id="group_all" name="group" value="5">
+      所有组
+    </label>
+  </div>
+
+  <div class="button-group">
+    <button id="begin" class="btn btn-primary btn-lg" type="button" onclick="begin()">
+      开始
+    </button>
+    <button id="end" class="btn btn-success btn-lg" type="button" onclick="myFunction()">
+      确定
+    </button>
+  </div>
+
+  <script>
+    var groupMap = {};
+
+    groupMap['group1'] = ['唐僧', '孙悟空', '猪八戒', '沙和尚', '白龙马', '白骨精', '牛魔王'];
+    groupMap['group2'] = ['宋江', '林冲', '武松', '鲁智深', '卢俊义', '李逵'];
+    groupMap['group3'] = ['贾宝玉', '林黛玉', '王熙凤', '薛宝钗', '史湘云', '秦可卿'];
+    groupMap['group4'] = ['刘备', '关羽', '张飞', '曹操', '诸葛亮', '孙权', '吕布'];
+
+    groupMap['group_all'] = [].concat(groupMap['group1'],
+                                      groupMap['group2'],
+                                      groupMap['group3'],
+                                      groupMap['group4']);
+
+    var lotteryTimer = null;
+    var imageNode = document.getElementById('image');
+    var nameNode = document.getElementById('name');
+    var audioNode = document.getElementById('audio');
+
+    function myFunction() {
+      clearInterval(lotteryTimer);
+      var groups = document.getElementsByName('group');
+      var name = nameNode.innerHTML;
+      for (var i = 0; i < groups.length; i++) {
+        if (groups[i].checked) {
+          console.debug('checked group is: %s', groups[i].id);
+          var group = groupMap[groups[i].id];
+          var index = group.indexOf(name);
+          console.debug('index is %s', index);
+          group.splice(index, 1);
+
+          console.debug('new group is: %s', groupMap[groups[i].id].toString());
+          break;
+        }
+      }
+      audioNode.pause();
+      lotteryTimer = null;
+    }
+
+    function begin() {
+      if (lotteryTimer != null) {
+        return;
+      }
+      var groups = document.getElementsByName('group');
+      var group = [];
+      for (var i = 0; i < groups.length; i++) {
+        if (groups[i].checked) {
+          group = groupMap[groups[i].id];
+        }
+      }
+      console.debug(group);
+      audioNode.play();
+      lotteryTimer = setInterval(function () {
+        var index = Math.floor((Math.random() * group.length));
+        var name = group[index];
+        var photoIndex = Math.floor((Math.random() * 26));
+        imageNode.src = 'photo/' + photoIndex + '.jpg';
+        nameNode.innerHTML = name;
+      }, 10);
+    }
+  </script>
+
+</body>
+</html>
